@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nebula Fin Dashboard | Portfolio Showcase</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define the Custom Font & Base Dark Mode */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d18; /* Near-Black for High Contrast */
+            color: #ffffff;
+            overflow-x: hidden;
+            padding-bottom: 100px; /* Space for fixed bottom bar */
+        }
+
+        /* 1. Deep Cosmic Violet Background (The Nebula) */
+        .cosmic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            /* Create the nebulous blend of violet and teal */
+            background: radial-gradient(circle at 50% 20%, rgba(109, 40, 217, 0.2) 0%, transparent 60%), /* Violet */
+                        radial-gradient(circle at 80% 60%, rgba(6, 214, 160, 0.1) 0%, transparent 50%); /* Teal */
+            animation: cosmicPulse 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes cosmicPulse {
+            from { opacity: 0.8; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* 2. Glassmorphism (Data Cards) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05); /* Semi-transparent */
+            backdrop-filter: blur(24px); /* Strong blur */
+            border: 1px solid rgba(139, 92, 246, 0.2); /* Violet Border for definition */
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 3. Neumorphism (Trade Buttons - Tactile) */
+        .neuro-button {
+            background-color: #0d0d18;
+            border-radius: 12px;
+            /* Outer shadows for the 'lifted' effect */
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.7),
+                        -5px -5px 10px rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        /* 4. Claymorphism (AI Chat FAB - Approachable) */
+        .clay-fab {
+            background: #06d6a0; /* Electric Teal for Technology/Support */
+            border-radius: 9999px; /* Fully rounded */
+            /* Puffy, light-source-dependent shadows */
+            box-shadow: 0 15px 30px rgba(6, 214, 160, 0.4), 
+                        inset 0 -5px 15px rgba(0, 0, 0, 0.2), 
+                        inset 0 5px 15px rgba(255, 255, 255, 0.2); 
+            transition: transform 0.3s ease-out;
+            cursor: pointer;
+            border: none;
+        }
+
+        .clay-fab:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 5. Kinetic Typography (P&L Simulation) */
+        .kinetic-text {
+            /* Kept for potential future use or dynamic effects on static elements */
+            animation: none;
+            transition: transform 0.1s ease-out;
+        }
+
+        .kinetic-update {
+            animation: scaleText 0.3s ease-out;
+        }
+
+        @keyframes scaleText {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* 3D Donut Simulation Styling */
+        .donut-shadow {
+            filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.6));
+            transform: rotateX(10deg); /* Tilt effect for 3D simulation */
+        }
+
+        /* Custom Dropdown/Search Styling - No longer fully needed, but keep if components remain */
+        .dropdown-menu {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid rgba(139, 92, 246, 0.2); 
+        }
+
+        /* Hide scrollbar for a cleaner look */
+        .candlestick-chart::-webkit-scrollbar {
+            display: none;
+        }
+        .candlestick-chart {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Cosmic Background (Area of Violet/Teal Blur) --><div class="cosmic-bg"></div>
+
+    <!-- Main Content Area --><div class="relative z-10 max-w-lg mx-auto p-4 space-y-4">
+        
+        <!-- Header & Top Metrics --><header class="pt-4 flex justify-between items-center">
+            <h1 class="text-xl font-extrabold text-white">NEBULA FIN</h1>
+            <button class="text-gray-400 hover:text-white transition duration-200 p-2 rounded-full hover:bg-white/10">
+                <!-- User Icon for Profile/Low-Frequency Actions --><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </button>
+        </header>
+
+        <!-- A. PRIMARY FOCUS AREA: Portfolio Value & AI Alert --><div class="flex flex-col gap-4">
+
+            <!-- Main Portfolio Value (Area 1 - Glass Card) --><div class="glass-card p-6 text-center">
+                <p class="text-sm font-medium text-gray-300">Total Portfolio Value</p>
+                <!-- VALUE IS NOW STATIC --><h2 id="portfolioValue" class="text-5xl font-extrabold mb-1 mt-1 text-white">
+                    $12,450.78
+                </h2>
+                <div id="plPercentage" class="text-lg font-semibold text-green-400 kinetic-text">
+                    +3.45% Today
+                </div>
+                <!-- NEW: Portfolio Analysis Button (Gemini LLM Feature 2) --><button onclick="analyzePortfolio()" id="analyzeBtn" class="mt-4 w-full neuro-button text-sm py-2 px-4 rounded-xl text-violet-300 hover:text-white transition-all flex items-center justify-center space-x-2 border border-violet-700/50">
+                    <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m7 0h3m-3 0h-3m3 0V5m0 14V5m0 0a2 2 0 012-2h2a2 2 0 012 2v14m-12 0h12"/></svg>
+                    <span class="font-semibold">✨ Deep Dive Analysis</span>
+                </button>
+                <div id="analysisOutput" class="mt-4 text-left text-sm text-gray-300 hidden"></div>
+            </div>
+
+            <!-- AI Risk Alert Card (Area 3 - Glass Card) --><div class="glass-card p-4 flex justify-between items-start">
+                <div>
+                    <div class="flex items-center space-x-2 mb-1">
+                        <div class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></div>
+                        <h3 class="text-xs font-bold text-yellow-400 uppercase">AI Risk Alert</h3>
+                    </div>
+                    <p id="alertContent" class="text-sm text-gray-200 transition-opacity duration-300">
+                        Market volatility is spiking above 80% due to BTC/ETH correlation.
+                    </p>
+                </div>
+                <!-- Customization button (Simulates swapping the alert source/focus) --><button onclick="swapAlert()" class="text-gray-500 hover:text-teal-400 transition p-1 rounded-full">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.4-1.09-.77-1.71-1.03L15 2.1c-.05-.23-.25-.37-.48-.37h-4c-.23 0-.43.14-.48.37L9.25 4.75c-.62.26-1.19.63-1.71 1.03l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.31.61.22l2.49-1c.52.4 1.09.77 1.71 1.03L9.25 21.9c.05.23.25.37.48.37h4c.23 0 .43-.14.48-.37l.82-2.58c.62-.26 1.19-.63 1.71-1.03l2.49 1c-.22.09-.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1-65zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- B. VISUALIZATION AREA (Asset Allocation) --><div class="glass-card p-6 flex flex-col">
+            
+            <!-- Header --><div class="mb-6">
+                <h3 class="text-xl font-bold text-white">Asset Allocation</h3>
+                <p class="text-sm text-gray-400">Portfolio Distribution</p>
+            </div>
+            
+            <!-- Donut Chart --><div class="relative flex justify-center items-center h-48 mb-8">
+                <svg width="240" height="240" viewBox="0 0 240 240" class="transform -rotate-90 donut-shadow">
+                    <!-- Total Circumference: 502.65 --><!-- 1. Violet BTC Segment (60% -> 301.59 length) --><circle cx="120" cy="120" r="80" fill="none" stroke="#8b5cf6" stroke-width="40" 
+                            stroke-dasharray="301.59 502.65" class="donut-segment"/>
+                    
+                    <!-- 2. Teal ETH Segment (25% -> 125.66 length) --><circle cx="120" cy="120" r="80" fill="none" stroke="#06d6a0" stroke-width="40" 
+                            stroke-dasharray="125.66 502.65" stroke-dashoffset="-301.59" class="donut-segment"/>
+                    
+                    <!-- 3. Stablecoins Segment (10% -> 50.26 length) - Cyan for distinction --><circle cx="120" cy="120" r="80" fill="none" stroke="#06b6d4" stroke-width="40" 
+                            stroke-dasharray="50.26 502.65" stroke-dashoffset="-427.25" class="donut-segment"/> 
+                    
+                    <!-- 4. Alts/DeFi Segment (5% -> 25.13 length) - Gray for high-risk/long-tail assets --><circle cx="120" cy="120" r="80" fill="none" stroke="#4b5563" stroke-width="40" 
+                            stroke-dasharray="25.13 502.65" stroke-dashoffset="-477.51" class="donut-segment"/>
+                    
+                    </svg>
+            </div>
+
+            <!-- SPACIOUS LEGEND --><div class="grid grid-cols-2 gap-y-6 gap-x-8 text-sm">
+                
+                <!-- 1. BTC (60%) --><div class="flex items-center justify-between border-b border-white/5 pb-2">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-violet-500 shadow-lg shadow-violet-500/30"></div>
+                        <span class="text-gray-200 font-medium">Bitcoin (BTC)</span>
+                    </div>
+                    <span class="font-extrabold text-violet-300 text-lg">60%</span>
+                </div>
+
+                <!-- 2. ETH (25%) --><div class="flex items-center justify-between border-b border-white/5 pb-2">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-teal-500 shadow-lg shadow-teal-500/30"></div>
+                        <span class="text-gray-200 font-medium">Ethereum (ETH)</span>
+                    </div>
+                    <span class="font-extrabold text-teal-300 text-lg">25%</span>
+                </div>
+                
+                <!-- 3. Stablecoins (10%) --><div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-cyan-500"></div>
+                        <span class="text-gray-300">Stablecoins</span>
+                    </div>
+                    <span class="font-semibold text-gray-400">10%</span>
+                </div>
+
+                <!-- 4. Alts/DeFi (5%) --><div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-gray-600"></div>
+                        <span class="text-gray-300">Alts/DeFi</span>
+                    </div>
+                    <span class="font-semibold text-gray-400">5%</span>
+                </div>
+            </div>
+            <!-- End SPACIOUS LEGEND --></div>
+
+        <!-- D. MARKET MOVERS CARD: Quick Market Overview --><div class="glass-card p-6 flex flex-col">
+            <h3 class="text-xl font-bold text-white mb-4">Top Market Movers</h3>
+            <p class="text-sm text-gray-400 mb-4">AI-curated list of high-momentum assets.</p>
+
+            <div class="space-y-3">
+                <!-- Mover Item 1 (Strong Gainer - Teal) --><div class="flex justify-between items-center text-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="font-bold text-teal-400">UNI</span>
+                        <span class="text-xs text-gray-500">Uniswap</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-semibold text-teal-400">+12.4%</span>
+                        <span class="block text-xs text-gray-300">$11.85</span>
+                    </div>
+                </div>
+
+                <!-- Mover Item 2 (Moderate Gainer - Green) --><div class="flex justify-between items-center text-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="font-bold text-green-400">ADA</span>
+                        <span class="text-xs text-gray-500">Cardano</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-semibold text-green-400">+3.1%</span>
+                        <span class="block text-xs text-gray-300">$0.38</span>
+                    </div>
+                </div>
+
+                <!-- Mover Item 3 (Moderate Loser - Red) --><div class="flex justify-between items-center text-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="font-bold text-red-400">DOT</span>
+                        <span class="text-xs text-gray-500">Polkadot</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-semibold text-red-400">-2.9%</span>
+                        <span class="block text-xs text-gray-300">$6.12</span>
+                    </div>
+                </div>
+
+                <!-- Mover Item 4 (Stable - Gray) --><div class="flex justify-between items-center text-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="font-bold text-gray-400">MATIC</span>
+                        <span class="text-xs text-gray-500">Polygon</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-semibold text-gray-400">-0.2%</span>
+                        <span class="block text-xs text-gray-300">$0.81</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- E. ACTION LAYER (Fixed Bottom Bar & FAB) --><!-- Fixed Bottom Bar for Transactional Actions (Neumorphism buttons) --><div class="fixed bottom-0 left-0 right-0 z-20 p-4 bg-gradient-to-t from-black to-black/80">
+        <div class="flex gap-4 max-w-lg mx-auto">
+            <!-- Buy Button --><button class="neuro-button flex-1 py-4 rounded-xl font-bold text-lg text-white bg-green-600 hover:bg-green-700 transition-colors">
+                BUY
+            </button>
+            
+            <!-- Sell Button --><button class="neuro-button flex-1 py-4 rounded-xl font-bold text-lg text-white bg-red-600 hover:bg-red-700 transition-colors">
+                SELL
+            </button>
+        </div>
+    </div>
+
+    <!-- AI Chat FAB (Claymorphism) - Floating Action Button --><button onclick="toggleModal()" class="clay-fab fixed bottom-20 right-6 w-14 h-14 flex items-center justify-center z-30">
+        <!-- Chat Icon (Simple SVG) --><svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+        </svg>
+    </button>
+
+    <!-- Chat Modal Overlay (Glassmorphism/AI Chat Context) --><div id="chatModal" class="fixed inset-0 z-40 bg-black/60 hidden justify-center items-end p-4 md:items-center">
+        <!-- Modal Content Container (Updated: Added flex-col and max-h) --><div class="glass-card p-6 m-4 w-full max-w-lg rounded-2xl animate-fade-in-up flex flex-col max-h-[90%]">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
+                <h3 class="text-xl font-bold text-teal-400">AI Trading Consultant</h3>
+                <button onclick="toggleModal()" class="text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10">
+                    <!-- Close Icon --><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            
+            <!-- Chat History Area (Updated: Added ID and overflow styling) --><div id="chatHistory" class="flex-grow overflow-y-auto space-y-4 mb-4 pr-2">
+                <!-- Initial Message (System/Welcome) --><div class="bg-violet-900/30 p-4 rounded-lg self-start">
+                    <p class="text-sm">Hello! I'm your **AI Trading Consultant**. Ask me about market news, portfolio concepts, or technical terms. I use Google Search for up-to-date data.</p>
+                </div>
+                <!-- Gemini Responses will go here --></div>
+
+            <!-- Input Area (Updated: Added ID for input and loader) --><div class="flex-shrink-0 space-y-2">
+                <div id="chatLoader" class="text-teal-400 text-sm hidden items-center justify-center">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Processing...
+                </div>
+                <input type="text" id="chatInput" placeholder="Ask a question..." 
+                        class="w-full bg-white/10 border border-white/20 rounded-lg p-3 text-sm focus:outline-none focus:border-teal-400 transition-colors text-white"
+                        onfocus="this.style.backgroundColor='#0d0d18'" onblur="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
+                        onkeydown="if(event.key === 'Enter') document.getElementById('sendBtn').click()">
+                <button onclick="sendChatMessage()" id="sendBtn" class="w-full bg-teal-600 py-3 rounded-lg font-semibold hover:bg-teal-500 transition-colors">
+                    Send Query
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // --- Gemini API Configuration & Core Functions ---
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=";
+        const API_KEY = ""; // Kept empty as per instructions
+
+        const SYSTEM_PROMPT_CONSULTANT = "You are a highly responsive, world-class financial analysis chatbot named 'AI Trading Consultant'. Your goal is to provide concise, factual, and helpful information to a crypto investor. Format your answers clearly, using Markdown. Use Google Search grounding for any request involving real-time data, definitions, or recent news.";
+        const SYSTEM_PROMPT_ANALYSIS = "You are a senior financial analyst writing a brief internal memo. Provide a concise, professional two-paragraph analysis of the provided cryptocurrency portfolio data. The first paragraph must discuss the current risk profile based on allocation. The second paragraph must suggest one specific, immediate action to optimize risk-adjusted returns and a brief justification. Do not use conversational language or pleasantries.";
+
+        // Initial values for static display
+        let currentValue = 12450.78; 
+
+
+        /**
+         * Generic function to call the Gemini API with exponential backoff.
+         * @param {string} userQuery - The specific text prompt for the model.
+         * @param {string} systemPrompt - The instruction defining the model's persona/behavior.
+         * @param {boolean} useGrounding - Whether to enable Google Search for grounding.
+         */
+        async function callGeminiApi(userQuery, systemPrompt, useGrounding = false) {
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            if (useGrounding) {
+                payload.tools = [{ "google_search": {} }];
+            }
+            
+            // Exponential Backoff implementation (max 4 attempts)
+            for (let attempt = 0; attempt < 4; attempt++) {
+                try {
+                    const response = await fetch(API_URL + API_KEY, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429 && attempt < 3) {
+                        const delay = Math.pow(2, attempt) * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue; // Retry
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        const text = candidate.content.parts[0].text;
+                        let sources = [];
+                        const groundingMetadata = candidate.groundingMetadata;
+                        
+                        // Extract grounding sources if used
+                        if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                            sources = groundingMetadata.groundingAttributions
+                                .map(attribution => ({
+                                    uri: attribution.web?.uri,
+                                    title: attribution.web?.title,
+                                }))
+                                .filter(source => source.uri && source.title);
+                        }
+
+                        return { text, sources };
+                    }
+                    return { text: "Sorry, I couldn't generate a response. Please try rephrasing your query.", sources: [] };
+
+                } catch (error) {
+                    console.error(`Attempt ${attempt + 1} failed:`, error);
+                    if (attempt < 3) {
+                        const delay = Math.pow(2, attempt) * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    }
+                }
+            }
+            return { text: "API request failed after multiple retries. Please check your network or try again later.", sources: [] };
+        }
+
+        // --- Portfolio Analysis Feature (Gemini LLM Feature 2) ---
+
+        /** Gathers current portfolio data and prompts Gemini for a professional analysis. */
+        async function analyzePortfolio() {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const analysisOutput = document.getElementById('analysisOutput');
+            
+            // NOTE: The allocation prompt is updated to reflect the more detailed 60/25/10/5 split
+            const analysisQuery = `As a senior financial analyst, provide a concise, professional two-paragraph analysis of a cryptocurrency portfolio with a total value of $${currentValue.toFixed(2)}, allocated as 60% Bitcoin (BTC), 25% Ethereum (ETH), 10% Stablecoins, and 5% Altcoins/DeFi. The first paragraph must discuss the current risk profile based on this allocation (BTC dominance vs. the Stablecoin/Altcoin diversification). The second paragraph must suggest one specific, immediate action to optimize risk-adjusted returns (e.g., rebalancing, new asset class) and a brief justification.`;
+
+            // Disable button and show loading state
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Generating Analysis...
+            `;
+            analysisOutput.classList.remove('hidden');
+            analysisOutput.innerHTML = '<p class="text-gray-500">Awaiting deep dive report...</p>';
+
+            // Call API (No grounding needed as data is synthetic/internal)
+            const result = await callGeminiApi(analysisQuery, SYSTEM_PROMPT_ANALYSIS, false);
+
+            // Format output (convert simple Markdown to HTML)
+            let formattedText = result.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            formattedText = formattedText.replace(/\n\n/g, '<br><br>');
+            formattedText = formattedText.replace(/\n/g, '<br>');
+
+            // Update UI with the generated analysis
+            analysisOutput.innerHTML = `
+                <h4 class="font-bold text-violet-300 mb-1">Portfolio Summary (Generated)</h4>
+                <div class="p-3 bg-white/5 rounded-lg border border-violet-500/30 text-xs leading-relaxed">${formattedText}</div>
+            `;
+            
+            // Restore button state
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = `
+                <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m7 0h3m-3 0h-3m3 0V5m0 14V5m0 0a2 2 0 012-2h2a2 2 0 012 2v14m-12 0h12"/></svg>
+                <span class="font-semibold">✨ Deep Dive Analysis</span>
+            `;
+        }
+
+        // --- Chat Interface Functions (Gemini LLM Feature 1) ---
+
+        /** Creates a styled chat bubble element for the history. */
+        function createMessageElement(text, isUser, sources = []) {
+            const div = document.createElement('div');
+            // User messages are teal, AI messages are violet
+            const roleClass = isUser ? 'bg-teal-700/50 self-end ml-auto' : 'bg-violet-900/30 self-start mr-auto';
+            
+            // Simple Markdown to HTML conversion for paragraphs and bold text
+            let htmlContent = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            htmlContent = htmlContent.replace(/\n/g, '<br>');
+
+            div.className = `p-4 rounded-xl max-w-[90%] ${roleClass}`;
+            div.innerHTML = `<p class="text-sm">${htmlContent}</p>`;
+
+            if (sources.length > 0) {
+                let sourcesHtml = '<div class="mt-3 pt-2 border-t border-white/20 text-xs text-gray-400">';
+                sourcesHtml += '<strong>Sources:</strong><ul>';
+                // Show up to 2 sources
+                sources.slice(0, 2).forEach((source) => {
+                     sourcesHtml += `<li><a href="${source.uri}" target="_blank" class="text-teal-400 hover:text-teal-300 transition-colors truncate block" title="${source.title}">${source.title}</a></li>`;
+                });
+                sourcesHtml += '</ul></div>';
+                div.innerHTML += sourcesHtml;
+            }
+            
+            return div;
+        }
+
+        /** Handles sending a message, calling the API, and updating chat history. */
+        async function sendChatMessage() {
+            const inputElement = document.getElementById('chatInput');
+            const chatHistory = document.getElementById('chatHistory');
+            const loader = document.getElementById('chatLoader');
+            const userQuery = inputElement.value.trim();
+
+            if (!userQuery) return;
+
+            // 1. Display user message
+            chatHistory.appendChild(createMessageElement(userQuery, true));
+            inputElement.value = '';
+            inputElement.disabled = true;
+            
+            // Scroll to bottom
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            // 2. Show loading spinner
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+
+            // 3. Call the API with grounding (uses Google Search)
+            const result = await callGeminiApi(userQuery, SYSTEM_PROMPT_CONSULTANT, true);
+
+            // 4. Hide loading spinner
+            loader.classList.add('hidden');
+            loader.classList.remove('flex');
+            inputElement.disabled = false;
+            
+            // 5. Display AI response
+            chatHistory.appendChild(createMessageElement(result.text, false, result.sources));
+            
+            // Scroll to bottom again
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // --- Existing Simulation/UI Logic ---
+        
+        // Removed setInterval(updatePortfolio, 2000); 
+
+        // 2. AI Alert Customization (Mandate: User Control/Diversity)
+        const alerts = [
+            "Market volatility is spiking above 80% due to BTC/ETH correlation.",
+            "Unusual whale activity detected in BTC markets. Consider portfolio rebalancing.",
+            "Strong support level identified at $12,200. Risk assessment: LOW.",
+            "Regulatory clarity is incoming for stablecoins; positive outlook for DeFi assets."
+        ];
+        let alertIndex = 0;
+        
+        function swapAlert() {
+            const alertContent = document.getElementById('alertContent');
+            
+            // Fade out
+            alertContent.classList.add('opacity-0');
+            
+            setTimeout(() => {
+                // Change content
+                alertIndex = (alertIndex + 1) % alerts.length;
+                alertContent.textContent = alerts[alertIndex];
+                
+                // Fade in
+                alertContent.classList.remove('opacity-0');
+            }, 300); // Match the CSS transition duration
+        }
+
+        // 3. AI Chat Modal (Claymorphism FAB interaction)
+        function toggleModal() {
+            const modal = document.getElementById('chatModal');
+            // Toggle visibility using Tailwind's hidden/flex
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+            
+            // If the modal is opening, add the fade-in animation
+            if (modal.classList.contains('flex')) {
+                const modalContent = modal.querySelector('.glass-card');
+                modalContent.classList.add('animate-fade-in-up');
+                setTimeout(() => {
+                    modalContent.classList.remove('animate-fade-in-up');
+                }, 500);
+                
+                // Focus on input when modal opens
+                document.getElementById('chatInput').focus();
+            }
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('chatModal').addEventListener('click', function(e) {
+            // Check if the click target is the modal backdrop itself, not its children
+            if (e.target === this) {
+                toggleModal();
+            }
+        });
+
+        // 4. Enhanced Neumorphism Button Feedback
+        document.querySelectorAll('.neuro-button').forEach(button => {
+            const originalShadow = button.style.boxShadow;
+            
+            button.addEventListener('mousedown', () => {
+                // Apply pressed state effect
+                button.style.boxShadow = 'inset 3px 3px 6px rgba(0, 0, 0, 0.8), inset -3px -3px 6px rgba(255, 255, 255, 0.03)';
+                button.style.transform = 'scale(0.98)';
+                button.style.backgroundColor = 'rgba(0, 0, 0, 0.3)'; // Slightly darken the internal color
+            });
+            
+            button.addEventListener('mouseup', () => {
+                // Restore original state after a small delay to register the press
+                setTimeout(() => {
+                    button.style.boxShadow = originalShadow;
+                    button.style.transform = 'scale(1)';
+                    button.style.backgroundColor = '';
+                }, 100);
+            });
+            
+            // Handle touch events for responsiveness
+            button.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Prevent default touch behavior (like double tap zoom)
+                button.style.boxShadow = 'inset 3px 3px 6px rgba(0, 0, 0, 0.8), inset -3px -3px 6px rgba(255, 255, 255, 0.03)';
+                button.style.transform = 'scale(0.98)';
+                button.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+            });
+            
+            button.addEventListener('touchend', () => {
+                 setTimeout(() => {
+                    button.style.boxShadow = originalShadow;
+                    button.style.transform = 'scale(1)';
+                    button.style.backgroundColor = '';
+                }, 100);
+            });
+        });
+
+        // Tailwind utility class for fade-in animation (for the modal) and custom scrollbar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-fade-in-up {
+                animation: fadeInUp 0.5s ease-out;
+            }
+            /* Custom Scrollbar for Chat History */
+            #chatHistory::-webkit-scrollbar {
+                width: 8px;
+            }
+            #chatHistory::-webkit-scrollbar-thumb {
+                background-color: rgba(139, 92, 246, 0.3); /* violet-500/30 */
+                border-radius: 4px;
+            }
+            #chatHistory::-webkit-scrollbar-track {
+                background: transparent;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
